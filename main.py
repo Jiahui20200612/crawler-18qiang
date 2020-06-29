@@ -53,6 +53,7 @@ async def get_post_id(pages, post_ids, client, lock):
         url = f'https://www.18qiang.com/thread-htm-fid-2-page-{page}.html'
         for retry_count in range(limit_retry):
             await lock.acquire()
+            print(url)
             async with client.get(url) as resp:
                 if resp.status != 200:
                     continue
@@ -62,7 +63,6 @@ async def get_post_id(pages, post_ids, client, lock):
             print(f'请求失败: {url}')
             continue
 
-        print(url)
         for post_id in re.findall('<a href="read-htm-tid-(\d*).*?" name="readlink"', html):
             await post_ids.put(post_id)
 
@@ -79,6 +79,7 @@ async def get_post(post_ids, client, lock, file):
         url = f'https://m.18qiang.com/read.php?tid={post_id}'
         for retry_count in range(limit_retry):
             await lock.acquire()
+            print(url)
             async with client.get(url) as resp:
                 if resp.status != 200:
                     continue
@@ -99,7 +100,6 @@ async def get_post(post_ids, client, lock, file):
             'content-raw': str(post_soup.select_one('div.detail')),
         }
         print(post, file=file)
-        print(url)
     await post_ids.put(None)
 
 
